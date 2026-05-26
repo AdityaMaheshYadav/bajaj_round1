@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFHL Analytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+            --panel-bg: rgba(30, 41, 59, 0.45);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --accent: #d946ef;
+            --accent-glow: rgba(217, 70, 239, 0.3);
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decorative Background Orbs */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        body::before {
+            top: 10%;
+            left: -100px;
+            background: var(--primary);
+        }
+
+        body::after {
+            bottom: 10%;
+            right: -100px;
+            background: var(--accent);
+        }
+
+        header {
+            padding: 2rem 4rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        main {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 4rem 3rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            flex-grow: 1;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+                padding: 0 2rem 2rem 2rem;
+            }
+            header {
+                padding: 1.5rem 2rem;
+            }
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2.25rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.75rem;
+        }
+
+        .config-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.65rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: monospace;
+            transition: var(--transition);
+            resize: vertical;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 16px var(--primary-glow);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1.1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px var(--primary-glow);
+            background: linear-gradient(135deg, #7c3aed 0%, var(--primary) 100%);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Filter Controls */
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .filter-chip.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+            color: #a5b4fc;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        /* Result View */
+        .response-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .response-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .response-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+        }
+
+        .response-card.even::before { background: #3b82f6; }
+        .response-card.odd::before { background: #f59e0b; }
+        .response-card.alphabets::before { background: #10b981; }
+        .response-card.special::before { background: #ec4899; }
+        .response-card.sum::before { background: #8b5cf6; }
+        .response-card.concat::before { background: #06b6d4; }
+
+        .response-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .response-value {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .item-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 0.25rem 0.65rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .meta-item {
+            font-size: 0.85rem;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-val {
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(150%);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .toast-icon.success {
+            background: var(--success);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(15, 23, 42, 0.2);
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .placeholder-view {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">B</div>
+            <div class="logo-text">BFHL Portal</div>
+        </div>
+        <div class="badge">SECURE API PORTAL</div>
+    </header>
+
+    <main>
+        <!-- Form Control Card -->
+        <section class="card">
+            <h2><span>⚙️</span> API Config & Request</h2>
+            <p class="section-desc">Configure your target API hosting URL and enter your input payload array to get parsed analytical telemetry immediately.</p>
+
+            <div class="config-group">
+                <label for="api-url">API Endpoint URL</label>
+                <input type="text" id="api-url" value="http://localhost:8080/bfhl" placeholder="e.g. https://your-app.railway.app/bfhl">
+            </div>
+
+            <div class="config-group">
+                <label for="json-payload">JSON Input Array</label>
+                <textarea id="json-payload" rows="6" placeholder='{ "data": ["a", "1", "334", "4", "R", "$"] }'>{
+  "data": ["a", "1", "334", "4", "R", "$"]
+}</textarea>
+            </div>
+
+            <button class="btn" id="submit-btn">
+                <span class="spinner" id="btn-spinner"></span>
+                <span id="btn-text">PROCESS PAYLOAD</span>
+            </button>
+        </section>
+
+        <!-- Response Filter / Analytics Display -->
+        <section class="card" style="min-height: 480px; display: flex; flex-direction: column;">
+            <h2><span>📊</span> Analytics Telemetry</h2>
+            
+            <div id="placeholder-view" class="placeholder-view">
+                <div class="placeholder-icon">📥</div>
+                <p>Waiting for request submission...</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Enter a valid JSON payload on the left and submit.</p>
+            </div>
+
+            <div id="results-view" style="display: none; flex-grow: 1;">
+                <p class="section-desc">Select response components from the multiselect filter to display specific details.</p>
+                
+                <label>Filters (Multi-Select Toggle)</label>
+                <div class="filter-container">
+                    <div class="filter-chip active" data-filter="even">Even Numbers</div>
+                    <div class="filter-chip active" data-filter="odd">Odd Numbers</div>
+                    <div class="filter-chip active" data-filter="alphabets">Alphabets</div>
+                    <div class="filter-chip active" data-filter="special">Special Characters</div>
+                    <div class="filter-chip active" data-filter="sum">Sum</div>
+                    <div class="filter-chip active" data-filter="concat">Alternating Concatenation</div>
+                </div>
+
+                <div class="response-container" id="response-cards">
+                    <!-- Cards will be populated dynamically -->
+                </div>
+
+                <div class="meta-grid" id="response-meta">
+                    <!-- Meta info populated dynamically -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toast-icon">!</div>
+        <div id="toast-msg">Error parsing request payload</div>
+    </div>
+
+    <footer>
+        <p>Built with ❤️ for Bajaj Round 1 | Candidate: <strong>Aditya Yadav</strong> (Roll: 0827IT231015)</p>
+    </footer>
+
+    <script>
+        const apiUrlInput = document.getElementById('api-url');
+        const jsonPayloadInput = document.getElementById('json-payload');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const btnText = document.getElementById('btn-text');
+        const placeholderView = document.getElementById('placeholder-view');
+        const resultsView = document.getElementById('results-view');
+        const responseCards = document.getElementById('response-cards');
+        const responseMeta = document.getElementById('response-meta');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastMsg = document.getElementById('toast-msg');
+
+        let rawResponseData = null;
+
+        // Filter chips click handling
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                chip.classList.toggle('active');
+                renderFilteredResponse();
+            });
+        });
+
+        function showToast(message, isSuccess = false) {
+            toastMsg.innerText = message;
+            if (isSuccess) {
+                toastIcon.innerText = '✓';
+                toastIcon.className = 'toast-icon success';
+            } else {
+                toastIcon.innerText = '!';
+                toastIcon.className = 'toast-icon';
+            }
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        submitBtn.addEventListener('click', async () => {
+            // Reset views
+            placeholderView.style.display = 'flex';
+            resultsView.style.display = 'none';
+
+            let payload;
+            try {
+                payload = JSON.parse(jsonPayloadInput.value);
+                if (!payload.data || !Array.isArray(payload.data)) {
+                    throw new Error("JSON payload must contain a 'data' array.");
+                }
+            } catch (e) {
+                showToast(e.message || "Invalid JSON syntax.");
+                return;
+            }
+
+            const apiUrl = apiUrlInput.value.trim();
+            if (!apiUrl) {
+                showToast("API Endpoint URL cannot be empty.");
+                return;
+            }
+
+            // Start Loading State
+            submitBtn.disabled = true;
+            btnSpinner.style.display = 'inline-block';
+            btnText.innerText = 'PROCESSING...';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.message || `Server returned status ${response.status}`);
+                }
+
+                rawResponseData = await response.json();
+                showToast("Payload processed successfully!", true);
+                
+                // Show analytics view
+                placeholderView.style.display = 'none';
+                resultsView.style.display = 'block';
+                renderFilteredResponse();
+
+            } catch (e) {
+                showToast("Request failed: " + e.message);
+            } finally {
+                // End Loading State
+                submitBtn.disabled = false;
+                btnSpinner.style.display = 'none';
+                btnText.innerText = 'PROCESS PAYLOAD';
+            }
+        });
+
+        function renderFilteredResponse() {
+            if (!rawResponseData) return;
+
+            responseCards.innerHTML = '';
+            
+            // Get active filters
+            const activeFilters = Array.from(document.querySelectorAll('.filter-chip.active'))
+                .map(chip => chip.getAttribute('data-filter'));
+
+            // Build map of cards
+            const cardData = [
+                {
+                    key: 'even',
+                    title: 'Even Numbers',
+                    class: 'even',
+                    val: rawResponseData.even_numbers || []
+                },
+                {
+                    key: 'odd',
+                    title: 'Odd Numbers',
+                    class: 'odd',
+                    val: rawResponseData.odd_numbers || []
+                },
+                {
+                    key: 'alphabets',
+                    title: 'Alphabets (Uppercase)',
+                    class: 'alphabets',
+                    val: rawResponseData.alphabets || []
+                },
+                {
+                    key: 'special',
+                    title: 'Special Characters',
+                    class: 'special',
+                    val: rawResponseData.special_characters || []
+                },
+                {
+                    key: 'sum',
+                    title: 'Sum of Numbers',
+                    class: 'sum',
+                    val: rawResponseData.sum || "0",
+                    isLiteral: true
+                },
+                {
+                    key: 'concat',
+                    title: 'Alternating Caps Reversed Concatenation',
+                    class: 'concat',
+                    val: rawResponseData.concat_string || "",
+                    isLiteral: true
+                }
+            ];
+
+            // Render selected cards
+            let cardsRendered = 0;
+            cardData.forEach(card => {
+                if (activeFilters.includes(card.key)) {
+                    cardsRendered++;
+                    const cardEl = document.createElement('div');
+                    cardEl.className = `response-card ${card.class}`;
+
+                    const titleEl = document.createElement('div');
+                    titleEl.className = 'response-title';
+                    titleEl.innerText = card.title;
+                    cardEl.appendChild(titleEl);
+
+                    const valEl = document.createElement('div');
+                    valEl.className = 'response-value';
+
+                    if (card.isLiteral) {
+                        valEl.innerText = card.val || '(empty)';
+                    } else {
+                        if (card.val.length === 0) {
+                            valEl.innerHTML = '<span style="color: var(--text-muted); font-size: 0.95rem; font-style: italic;">None detected</span>';
+                        } else {
+                            const badgeList = document.createElement('div');
+                            badgeList.className = 'badge-list';
+                            card.val.forEach(item => {
+                                const badge = document.createElement('span');
+                                badge.className = 'item-badge';
+                                badge.innerText = item;
+                                badgeList.appendChild(badge);
+                            });
+                            valEl.appendChild(badgeList);
+                        }
+                    }
+                    cardEl.appendChild(valEl);
+                    responseCards.appendChild(cardEl);
+                }
+            });
+
+            if (cardsRendered === 0) {
+                responseCards.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 2rem; font-style: italic; font-size: 0.95rem;">Select filters above to display results.</div>';
+            }
+
+            // Render metadata info
+            responseMeta.innerHTML = `
+                <div class="meta-item">
+                    <div class="meta-label">User ID</div>
+                    <div class="meta-val">${rawResponseData.user_id}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">College Roll Number</div>
+                    <div class="meta-val">${rawResponseData.roll_number}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Email Address</div>
+                    <div class="meta-val">${rawResponseData.email}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Response Status</div>
+                    <div class="meta-val" style="color: ${rawResponseData.is_success ? 'var(--success)' : 'var(--danger)'}">
+                        ${rawResponseData.is_success ? 'SUCCESS (200)' : 'FAILED'}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
