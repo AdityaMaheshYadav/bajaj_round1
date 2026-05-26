@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/bfhl")
 @CrossOrigin(origins = "*")
 public class BfhlController {
 
@@ -18,14 +17,23 @@ public class BfhlController {
         this.bfhlService = bfhlService;
     }
 
-    @PostMapping
+    @PostMapping("/bfhl")
     public ResponseEntity<BfhlResponse> processData(@Valid @RequestBody BfhlRequest request) {
         BfhlResponse response = bfhlService.processData(request);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/bfhl")
     public ResponseEntity<Object> getOperationCode() {
         return ResponseEntity.ok(java.util.Map.of("operation_code", 1));
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<Object> checkHealth() {
+        return ResponseEntity.ok(java.util.Map.of(
+                "status", "UP",
+                "is_success", true,
+                "timestamp", java.time.Instant.now().toString()
+        ));
     }
 }

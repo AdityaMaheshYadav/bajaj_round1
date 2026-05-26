@@ -58,6 +58,15 @@ class BfhlControllerTest {
     }
 
     @Test
+    @DisplayName("GET /health should return status UP")
+    void testGetHealth() throws Exception {
+        mockMvc.perform(get("/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.is_success").value(true));
+    }
+
+    @Test
     @DisplayName("POST /bfhl with empty body should return 400")
     void testPostBfhlEmptyBody() throws Exception {
         mockMvc.perform(post("/bfhl")
